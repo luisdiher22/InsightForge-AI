@@ -15,18 +15,6 @@ I made it because real business files usually do not come with perfect column na
 - Inventory-aware KPIs and charts alongside sales analytics
 - Persisted metadata so each dataset remembers what was detected
 
-## Portfolio story
-
-I built this project to solve a real business problem: messy spreadsheets should not stop a small business from understanding its sales and inventory data.
-
-The main things I wanted to show here are:
-
-- how I designed safer LLM-based field mapping
-- how I separated analysis logic into reusable services and routers
-- how I made the dashboard adapt to different dataset types
-- how I handled bad files with clear, user-friendly messages
-- how I packaged the project so someone else can try it quickly
-
 ## Stack
 
 - FastAPI
@@ -49,7 +37,7 @@ flowchart LR
 
 ## What the app does
 
-1. I upload a CSV or Excel file.
+1. Upload a CSV or Excel file.
 2. The API checks for empty columns, invalid numbers, and corrupted files.
 3. The LLM proposes a normalized `column_mapping`.
 4. The app detects the available KPIs and charts.
@@ -142,7 +130,7 @@ Each dataset stores:
 
 ## Error messages
 
-When the file is not reliable enough to analyze, I show clear messages like:
+When the file is not reliable enough to analyze, it will show clear messages like:
 
 - `No pude detectar KPIs`
 - `El archivo no parece tener columnas numéricas`
