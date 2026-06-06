@@ -56,6 +56,8 @@ flowchart LR
 
 I made the project easier to test from GitHub by defaulting the database to SQLite, so anyone can clone the repo and run it locally without setting up PostgreSQL first.
 
+There are also some example datasets on the data folder , or you can use your own for testing!
+
 For the full analysis experience, Ollama still needs to be running locally.
 
 ### Requirements
