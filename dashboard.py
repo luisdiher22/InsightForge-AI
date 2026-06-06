@@ -668,11 +668,6 @@ def render_app_shell():
             <div class="hero-panel">
                 <h4>Highlights</h4>
                 <div class="hero-metric">
-                    <div class="hero-metric-label">Dashboard mode</div>
-                    <div class="hero-metric-value">Product style</div>
-                    <div class="hero-metric-note">Tabs, hierarchy, and visual cards instead of a vertical report.</div>
-                </div>
-                <div class="hero-metric">
                     <div class="hero-metric-label">Coverage</div>
                     <div class="hero-metric-value">Sales + Stock</div>
                     <div class="hero-metric-note">Supports total stock, inventory value, location and category breakdowns.</div>

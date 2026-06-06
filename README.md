@@ -15,6 +15,8 @@ I made it because real business files usually do not come with perfect column na
 - Inventory-aware KPIs and charts alongside sales analytics
 - Persisted metadata so each dataset remembers what was detected
 
+![1780712135067](image/README/1780712135067.png)
+
 ## Stack
 
 - FastAPI
