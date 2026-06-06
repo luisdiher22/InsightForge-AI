@@ -83,6 +83,8 @@ ollama serve
 ollama pull qwen2.5:14b
 ```
 
+Note for Docker users on Windows/Mac: if you run `ollama serve` on your host, containers can reach it using `host.docker.internal`. The compose setup sets `OLLAMA_HOST=http://host.docker.internal:11434` for the API so it can call your local Ollama service.
+
 ### Run the API
 
 ```bash

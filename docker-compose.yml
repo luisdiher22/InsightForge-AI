@@ -6,6 +6,7 @@ services:
       - "8000:8000"
     environment:
       - DATABASE_URL=sqlite:///./sales_kpi.db
+      - OLLAMA_HOST=http://host.docker.internal:11434
     volumes:
       - ./:/app
 

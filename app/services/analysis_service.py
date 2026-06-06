@@ -1,4 +1,5 @@
 import json
+import logging
 import re
 from typing import Any, Dict, Iterable, List, Mapping, Optional
 
@@ -6,6 +7,8 @@ import pandas as pd
 from ollama import chat
 
 from app.kpi_rules import get_available_charts, get_available_kpis
+
+logger = logging.getLogger(__name__)
 
 
 ALLOWED_FIELDS = [
@@ -169,63 +172,94 @@ Important:
 
 def infer_column_mapping(columns, sample_rows=None):
     prompt = _build_prompt(columns, sample_rows)
+    try:
+        response = chat(
+            model="qwen2.5:14b",
+            messages=[
+                {
+                    "role": "user",
+                    "content": prompt,
+                }
+            ],
+        )
 
-    response = chat(
-        model="qwen2.5:14b",
-        messages=[
-            {
-                "role": "user",
-                "content": prompt,
-            }
-        ],
-    )
+        content = response.message.content
 
-    content = response.message.content
+        print("===== COLUMN MAPPING LLM RESPONSE =====")
+        print(content)
+        print("======================================")
 
-    print("===== COLUMN MAPPING LLM RESPONSE =====")
-    print(content)
-    print("======================================")
+        raw_mapping = clean_llm_json_response(content)
+        return normalize_column_mapping(raw_mapping, columns=columns)
+    except Exception as e:
+        # Fall back to rule-based heuristics if the LLM is not reachable
+        logger.warning("LLM column mapping failed, using heuristics fallback: %s", e)
+        fallback: Dict[str, str] = {}
+        for col in columns:
+            nf = _normalize_field_name(col, None)
+            if nf:
+                fallback[col] = nf
 
-    raw_mapping = clean_llm_json_response(content)
-    return normalize_column_mapping(raw_mapping, columns=columns)
+        return normalize_column_mapping(fallback, columns=columns)
 
 
 def analyze_dataset_with_llm(columns, sample_rows):
     prompt = _build_prompt(columns, sample_rows)
+    try:
+        response = chat(
+            model="qwen2.5:14b",
+            messages=[
+                {
+                    "role": "user",
+                    "content": prompt,
+                }
+            ],
+        )
 
-    response = chat(
-        model="qwen2.5:14b",
-        messages=[
-            {
-                "role": "user",
-                "content": prompt,
-            }
-        ],
-    )
+        content = response.message.content
 
-    content = response.message.content
+        print("===== DATASET ANALYSIS LLM RESPONSE =====")
+        print(content)
+        print("=========================================")
+        analysis = clean_llm_json_response(content)
 
-    print("===== DATASET ANALYSIS LLM RESPONSE =====")
-    print(content)
-    print("=========================================")
-    analysis = clean_llm_json_response(content)
+        raw_mapping = analysis.get("column_mapping", {})
+        mapping = normalize_column_mapping(raw_mapping, columns=columns)
 
-    raw_mapping = analysis.get("column_mapping", {})
-    mapping = normalize_column_mapping(raw_mapping, columns=columns)
+        analysis["column_mapping"] = mapping
+        analysis["detected_fields"] = [
+            field for field in dict.fromkeys(mapping.values())
+            if field in ALLOWED_FIELDS
+        ]
 
-    analysis["column_mapping"] = mapping
-    analysis["detected_fields"] = [
-        field for field in dict.fromkeys(mapping.values())
-        if field in ALLOWED_FIELDS
-    ]
+        dataset_type = analysis.get("dataset_type", "")
+        detected_fields = analysis["detected_fields"]
 
-    dataset_type = analysis.get("dataset_type", "")
-    detected_fields = analysis["detected_fields"]
+        analysis["available_kpis"] = get_available_kpis(dataset_type, detected_fields)
+        analysis["available_charts"] = get_available_charts(dataset_type, detected_fields)
 
-    analysis["available_kpis"] = get_available_kpis(dataset_type, detected_fields)
-    analysis["available_charts"] = get_available_charts(dataset_type, detected_fields)
+        return analysis
+    except Exception as e:
+        # If Ollama / LLM is not reachable, fallback to heuristic-based analysis
+        logger.warning("LLM analysis failed, falling back to heuristics: %s", e)
+        mapping: Dict[str, str] = {}
+        for col in columns:
+            nf = _normalize_field_name(col, None)
+            if nf:
+                mapping[col] = nf
 
-    return analysis
+        detected_fields = [field for field in dict.fromkeys(mapping.values()) if field in ALLOWED_FIELDS]
+
+        analysis: Dict[str, Any] = {
+            "dataset_type": "unknown",
+            "business_description": "LLM unreachable — heuristic analysis used",
+            "column_mapping": mapping,
+            "detected_fields": detected_fields,
+            "available_kpis": get_available_kpis("unknown", detected_fields),
+            "available_charts": get_available_charts("unknown", detected_fields),
+        }
+
+        return analysis
 
 
 def validate_dataframe(df: pd.DataFrame) -> Dict[str, Any]:
