@@ -4,6 +4,8 @@ Hey, this is a project I built to help small businesses upload messy datasets, u
 
 I made it because real business files usually do not come with perfect column names. One spreadsheet might say `Sales_Volume`, another might say `Unit_Price`, `Qty`, `Stock_On_Hand`, or `SKU`. My goal was to make the app smart enough to separate sales from inventory, avoid bad mappings, and only show the metrics that actually exist in the file.
 
+![1780709945758](image/README/1780709945758.png)
+
 ## What I built
 
 - A FastAPI backend for dataset analysis and KPI generation
@@ -116,29 +118,6 @@ Then open:
 
 This is the easiest way for other people to test the project from GitHub because it starts both services with one command.
 
-### What reviewers should check
-
-If someone is reviewing this as a portfolio project, I want them to try these things:
-
-1. Open the dashboard and upload `data/test_sales.csv`.
-2. Confirm the app detects sales KPIs and renders charts.
-3. Upload an inventory-style file and confirm the inventory KPIs appear.
-4. Try a broken or empty file and confirm the validation message is clear.
-5. Check that the README and Docker Compose flow are enough to run the project without guessing.
-
-### Test with sample data
-
-1. Open the dashboard in the browser.
-2. Upload `data/test_sales.csv` or another CSV/Excel file.
-3. Review the detected KPIs, charts, and validation summary.
-4. Check that the app stores the metadata for the dataset.
-
-### Run the tests
-
-```bash
-python -m unittest test_llm_mapping.py
-```
-
 ## API endpoints
 
 - `POST /analyze-dataset`
@@ -175,25 +154,10 @@ When the file is not reliable enough to analyze, I show clear messages like:
 - `app/services/` for shared analysis logic
 - `app/models.py` for persistence
 - `dashboard.py` for the Streamlit UI
-
-## Screenshots
-
-I recommend adding a `docs/screenshots/` folder with images of:
-
-- the upload flow
-- the sales dashboard
-- the inventory dashboard
-- the validation states
-
-For the final portfolio version, I would place screenshots next to these names:
-
-- `docs/screenshots/upload.png`
-- `docs/screenshots/sales-dashboard.png`
-- `docs/screenshots/inventory-dashboard.png`
-- `docs/screenshots/validation-state.png`
+- 
 
 ## Notes
 
-If I want to use PostgreSQL instead of SQLite, I can set `DATABASE_URL` before starting the app.
+If you want to use PostgreSQL instead of SQLite,  set `DATABASE_URL` before starting the app.
 
-If I run the dashboard outside Docker, it uses `http://127.0.0.1:8000` by default. Inside Docker Compose, it points to the API service automatically.
+If you run the dashboard outside Docker, it uses `http://127.0.0.1:8000` by default. Inside Docker Compose, it points to the API service automatically.
