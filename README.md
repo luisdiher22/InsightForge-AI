@@ -1,4 +1,4 @@
-# Sales KPI API
+# InsightForge AI
 
 Hey, this is a project I built to help small businesses upload messy datasets, understand what the columns mean, validate the file quality, and turn the data into useful sales and inventory KPIs.
 
